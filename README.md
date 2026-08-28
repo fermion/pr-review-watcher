@@ -67,12 +67,21 @@ bash bin/pr-watch.sh                                     # force a poll now
 ./uninstall.sh                                           # stop it
 ```
 
+Run the tests (they cover command construction, which a dry-run does **not**):
+
+```sh
+./test.sh
+```
+
 Dry-run the window logic without starting a real review:
 
 ```sh
 PR_REVIEW_TEST_CMD="echo hello" bin/pr-review-window.sh \
   ~/code/repo https://github.com/acme/api/pull/1 "test"
 ```
+
+Note that `PR_REVIEW_TEST_CMD` *replaces* the whole command, so it bypasses
+`REVIEW_COMMAND` substitution entirely. Use `./test.sh` to check that.
 
 ## How it works
 
