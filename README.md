@@ -45,10 +45,36 @@ allow it — see [Troubleshooting](#troubleshooting).
 | `REPOS` | Array of `"owner/repo:/path/to/local/checkout"`. The checkout is where the review session starts, so repo-local Claude skills resolve. |
 | `GITHUB_LOGIN` | Your login; your own PRs are skipped. Empty reviews your own too. |
 | `SKIP_DRAFTS` | Skip draft PRs. |
-| `REVIEW_COMMAND` | Command run in the tab. `{url}` is replaced with the PR URL. |
+| `REVIEW_COMMAND` | Command run in the tab; `{url}` is replaced with the PR URL. The default assumes a Claude Code skill named `pr-review` that takes a PR URL — see below. |
 | `MAX_LAUNCH` | Tabs per poll; `0` = unlimited. PRs over the cap are marked seen, not deferred. |
 | `POLL_INTERVAL` | Seconds between polls. Re-run `install.sh` after changing. |
 | `NOTIFIER` | `auto` \| `alerter` \| `osascript` \| `none`. |
+
+### The `pr-review` skill
+
+The default `REVIEW_COMMAND` is:
+
+```sh
+claude "/pr-review {url}"
+```
+
+which assumes you have a Claude Code skill called `pr-review` that accepts a PR
+URL — for example `.claude/skills/pr-review/SKILL.md` committed in the repo
+you're watching, so reviews follow that project's own conventions. The session
+starts in the checkout directory named in `REPOS`, so a repo-local skill or
+slash command resolves with no extra setup.
+
+Don't have one? Either write it, or just ask in plain language:
+
+```sh
+REVIEW_COMMAND='claude "Review this pull request and report findings: {url}"'
+```
+
+Nothing here is Claude-specific — any runnable command works:
+
+```sh
+REVIEW_COMMAND='gh pr checkout {url} && my-review-tool'
+```
 
 Watch several repos at once:
 

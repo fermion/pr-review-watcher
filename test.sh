@@ -59,6 +59,12 @@ else
 fi
 
 
+# 5b. The shipped example config, used verbatim, must build a correct command.
+#     This is the file install.sh copies, so a quoting slip in it ships broken.
+got="$(run "$HERE/config.example.sh")"
+[[ "$got" == "$want" ]] && ok "config.example.sh builds a valid command" \
+  || bad "config.example.sh valid" "$want" "$got"
+
 # ---------------------------------------------------------------------------
 # pr-watch.sh: which PRs get reviewed at all
 # ---------------------------------------------------------------------------

@@ -16,6 +16,21 @@ GITHUB_LOGIN=""
 SKIP_DRAFTS=true
 
 # Command run in the new tab. {url} is replaced with the pull request URL.
+#
+# The default assumes you have a Claude Code skill called `pr-review` that takes
+# a PR URL -- say, .claude/skills/pr-review/SKILL.md inside the repo you are
+# watching, so the review follows that project's own conventions. The session
+# starts in the checkout directory named in REPOS, so a repo-local skill (or
+# slash command) resolves without any extra setup.
+#
+# If you do not have such a skill, either write one, or just ask for the review
+# in plain language:
+#
+#   REVIEW_COMMAND='claude "Review this pull request and report findings: {url}"'
+#
+# Anything runnable works here -- it does not have to be Claude:
+#
+#   REVIEW_COMMAND='gh pr checkout {url} && my-review-tool'
 REVIEW_COMMAND='claude "/pr-review {url}"'
 
 # Max review tabs to open per poll. 0 = unlimited.
