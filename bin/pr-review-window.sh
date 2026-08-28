@@ -34,7 +34,12 @@ STATE_DIR="${PR_WATCH_STATE_DIR:-$HOME/.local/state/pr-review-watcher}"
 # shellcheck disable=SC1090
 [[ -f "$CONFIG" ]] && source "$CONFIG"
 
-REVIEW_COMMAND="${REVIEW_COMMAND:-claude \"/pr-review {url}\"}"
+# NOT ${REVIEW_COMMAND:-...}: bash ends a ${...} at the first unescaped `}`,
+# which inside a default containing "{url}" is the brace of {url} itself -- the
+# rest of the default then leaks out as literal text appended to the command.
+if [[ -z "${REVIEW_COMMAND:-}" ]]; then
+  REVIEW_COMMAND='claude "/pr-review {url}"'
+fi
 NOTIFIER="${NOTIFIER:-auto}"
 ALERTER="${ALERTER:-$HOME/bin/alerter}"
 NOTIFIER_SENDER="${NOTIFIER_SENDER:-com.apple.Terminal}"
