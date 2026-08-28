@@ -3,7 +3,10 @@
 # Normally run by the LaunchAgent installed by install.sh; safe to run by hand.
 set -euo pipefail
 
+# launchd gives a minimal PATH, so set a usable one explicitly. PR_WATCH_EXTRA_PATH
+# is prepended -- used by test.sh to stub `gh`, and useful if your gh lives elsewhere.
 export PATH="/opt/homebrew/bin:/usr/local/bin:$HOME/.local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+[[ -n "${PR_WATCH_EXTRA_PATH:-}" ]] && export PATH="$PR_WATCH_EXTRA_PATH:$PATH"
 
 CONFIG="${PR_WATCH_CONFIG:-$HOME/.config/pr-review-watcher/config.sh}"
 STATE_DIR="${PR_WATCH_STATE_DIR:-$HOME/.local/state/pr-review-watcher}"

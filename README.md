@@ -67,11 +67,29 @@ bash bin/pr-watch.sh                                     # force a poll now
 ./uninstall.sh                                           # stop it
 ```
 
-Run the tests (they cover command construction, which a dry-run does **not**):
+### Tests
 
 ```sh
 ./test.sh
 ```
+
+18 checks, no network and no GUI — `gh` and the window launcher are stubbed, so
+the suite runs anywhere.
+
+**Covered:** review-command construction (default, from config, repeated
+`{url}`, no leaked literals), rejection of non-GitHub URLs, first-run seeding,
+already-seen dedupe, draft and own-PR filtering, `MAX_LAUNCH`, launcher
+arguments, missing checkout, and `gh` failure — including that a failed poll
+does *not* mark the PR seen, so it is picked up next time rather than silently
+lost.
+
+The suite is mutation-tested: deliberately removing the seeding guard, the
+dedupe check, either filter, or swapping the launcher's arguments each makes it
+fail.
+
+**Not covered**, because it needs a real GUI session: iTerm2 tab creation, focus
+behavior, TCC/Automation permission, and notification delivery. Those were
+verified by measurement instead — see the design notes above.
 
 Dry-run the window logic without starting a real review:
 
