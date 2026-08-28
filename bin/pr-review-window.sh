@@ -89,7 +89,8 @@ fallback_open_window() {
   local launch_dir="$STATE_DIR/launchers"
   mkdir -p "$launch_dir"
   find "$launch_dir" -name '*.command' -mtime +1 -delete 2>/dev/null || true
-  local script="$launch_dir/pr-review-$(date +%s)-$$.command"
+  local script
+  script="$launch_dir/pr-review-$(date +%s)-$$.command"
   printf '#!/bin/bash\n%s\n' "$cmd" > "$script"
   chmod +x "$script"
   open -g -a "$ITERM_APP" "$script" 2>/dev/null || open -a "$ITERM_APP" "$script"

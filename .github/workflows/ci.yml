@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    # Runs on macOS deliberately: this tool is macOS-only, and /bin/bash there is
+    # 3.2, where quirks like "iterating an empty array under set -u is an error"
+    # actually bite. A Linux runner's bash 5 would hide them.
+    name: tests (macOS, bash 3.2)
+    runs-on: macos-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Environment
+        run: |
+          /bin/bash --version | head -1
+          jq --version
+
+      - name: Run test suite
+        run: ./test.sh
+
+  shellcheck:
+    name: shellcheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      # severity=warning: the suite uses `cond && ok ... || bad ...` throughout,
+      # which trips SC2015 (info) everywhere without indicating a real problem.
+      - name: Run shellcheck
+        run: shellcheck --severity=warning bin/*.sh install.sh uninstall.sh test.sh

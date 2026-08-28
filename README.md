@@ -1,5 +1,7 @@
 # pr-review-watcher
 
+[![CI](https://github.com/fermion/pr-review-watcher/actions/workflows/ci.yml/badge.svg)](https://github.com/fermion/pr-review-watcher/actions/workflows/ci.yml)
+
 Watches GitHub repos for newly-opened pull requests and starts a Claude Code
 review for each one — in a new tab of a single iTerm2 window, **without stealing
 focus**, with a desktop notification instead.
@@ -99,11 +101,14 @@ bash bin/pr-watch.sh                                     # force a poll now
 ./test.sh
 ```
 
-18 checks, no network and no GUI — `gh` and the window launcher are stubbed, so
-the suite runs anywhere.
+19 checks, no network and no GUI — `gh` and the window launcher are stubbed, so
+the suite runs anywhere. CI runs them on **macOS** on every push and pull
+request, because `/bin/bash` there is 3.2 and a Linux runner's bash 5 would hide
+version-specific traps. A second job runs `shellcheck`.
 
 **Covered:** review-command construction (default, from config, repeated
-`{url}`, no leaked literals), rejection of non-GitHub URLs, first-run seeding,
+`{url}`, no leaked literals, and that the shipped `config.example.sh` itself
+builds a valid command), rejection of non-GitHub URLs, first-run seeding,
 already-seen dedupe, draft and own-PR filtering, `MAX_LAUNCH`, launcher
 arguments, missing checkout, and `gh` failure — including that a failed poll
 does *not* mark the PR seen, so it is picked up next time rather than silently
