@@ -33,6 +33,9 @@ POLL_INTERVAL=300
 #   osascript- built in, no click-to-focus
 NOTIFIER="auto"
 
+# Where iTerm2 lives, if not in the default location.
+ITERM_APP="/Applications/iTerm.app"
+
 # Path to alerter, if you use it.
 ALERTER="$HOME/bin/alerter"
 

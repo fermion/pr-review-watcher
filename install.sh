@@ -12,19 +12,55 @@ STATE_DIR="$HOME/.local/state/pr-review-watcher"
 
 say() { printf '  %s\n' "$*"; }
 
+ITERM_APP="${ITERM_APP:-/Applications/iTerm.app}"
+
+install_hint() {
+  case "$1" in
+    gh)     echo "brew install gh" ;;
+    jq)     echo "brew install jq" ;;
+    iTerm2) echo "brew install --cask iterm2" ;;
+    *)      echo "ships with macOS - a missing one means a broken PATH" ;;
+  esac
+}
+
 echo "==> Checking dependencies"
-missing=0
+missing=()
 for tool in gh jq osascript lsappinfo; do
   if command -v "$tool" >/dev/null 2>&1; then say "ok       $tool"
-  else say "MISSING  $tool"; missing=1; fi
+  else say "MISSING  $tool"; missing+=("$tool"); fi
 done
-if [[ -d /Applications/iTerm.app ]]; then say "ok       iTerm2"
-else say "MISSING  iTerm2 (required - the tab logic is iTerm2-specific)"; missing=1; fi
-command -v claude >/dev/null 2>&1 && say "ok       claude" || say "warning  claude not on PATH (needed unless you change REVIEW_COMMAND)"
-(( missing )) && { echo "Install the missing tools and re-run."; exit 1; }
+if [[ -d "$ITERM_APP" ]]; then say "ok       iTerm2"
+else say "MISSING  iTerm2 at $ITERM_APP"; missing+=("iTerm2"); fi
+
+if command -v claude >/dev/null 2>&1; then
+  say "ok       claude"
+else
+  say "warning  claude not on PATH"
+  say "         Reviews will fail unless you change REVIEW_COMMAND in the config."
+  say "         Install: https://claude.com/claude-code"
+fi
+
+if (( ${#missing[@]} )); then
+  echo
+  if (( ${#missing[@]} == 1 )); then noun="dependency"; else noun="dependencies"; fi
+  echo "Missing ${#missing[@]} required $noun:"
+  for tool in "${missing[@]}"; do
+    printf '  %-9s %s\n' "$tool" "$(install_hint "$tool")"
+  done
+  if ! command -v brew >/dev/null 2>&1; then
+    echo
+    echo "  Homebrew is not on your PATH either: https://brew.sh"
+  fi
+  echo
+  echo "Then re-run ./install.sh"
+  exit 1
+fi
 
 if ! gh auth status >/dev/null 2>&1; then
-  echo "==> gh is not authenticated. Run: gh auth login"
+  echo
+  echo "==> gh is installed but not authenticated."
+  echo "    Run:  gh auth login"
+  echo "    Then re-run ./install.sh"
   exit 1
 fi
 say "ok       gh authenticated"
